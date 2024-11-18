@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Raspberry Pi Boot Analysis
+GenericName=Raspberry Pi Boot Analysis
+Comment=View boot statistics
+Icon=rpi
+Exec=/usr/bin/x-www-browser file:///run/rpi-analyse-boot.service/index.html
+Type=Application
+Categories=Utility;

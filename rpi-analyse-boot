@@ -1,0 +1,145 @@
+#!/bin/sh
+
+set -e
+
+# Prerequisite: system must be fully started to run analyze commands
+echo 'is-system-running: '
+systemctl is-system-running --wait
+
+echo "Ensuring RUNTIME_DIRECTORY is present"
+SERVICE_NAME="$(basename "$0")"
+RUNTIME_DIRECTORY="${RUNTIME_DIRECTORY:=/run/${SERVICE_NAME}.service}"
+mkdir -p "${RUNTIME_DIRECTORY}"
+HTML_FILE="${RUNTIME_DIRECTORY}/index.html"
+
+# Header
+echo "Generating HTML header"
+echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB" lang="en-GB">
+<head>
+    <title>RPI Boot Analysis</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>' > "${HTML_FILE}"
+
+# System/Videocore Information
+echo "Generating system/videocore information"
+# shellcheck disable=SC2129
+{
+	echo '<h2>System Information</h2>'
+	echo '<h3>General</h3>'
+	echo '<pre>'
+
+	sed 's/\x0//g' /sys/firmware/devicetree/base/model
+	echo
+
+	head -4 /etc/os-release
+	echo
+
+	cat /etc/rpi-issue
+	echo
+
+	uname -a
+	echo
+
+	tail -3 /proc/cpuinfo
+
+	echo "Throttled flag  : $(vcgencmd get_throttled)"
+	echo "Camera          : $(vcgencmd get_camera)"
+	echo '</pre>'
+
+	echo '<h3>Videocore</h3>'
+	echo '<pre>'
+
+	vcgencmd version
+	echo
+	vcgencmd mem_reloc_stats || true
+	echo '</pre>'
+} >> "${HTML_FILE}"
+
+# Critical Path
+echo "Generating critical-chain analysis"
+{
+	echo '<h2>Critical Path to Graphical Boot</h2>'
+	echo '<pre>'
+	script \
+		--quiet \
+		--command \
+			'systemd-analyze --no-pager critical-chain graphical.target' \
+		/dev/null | \
+	aha \
+		--no-header
+	echo '</pre>'
+} >> "${HTML_FILE}"
+
+# Bootchart
+echo "Generating bootchart"
+{
+	echo '<h2>Bootchart</h2>'
+	printf '<object data="data:image/svg+xml;base64,'
+	systemd-analyze plot | base64 --wrap=0
+	echo '" ></object>'
+} >> "${HTML_FILE}"
+
+# rpi-trace-boot Boot Trace
+N_INSTALLED=0
+{
+	2>/dev/null dpkg -s rpi-trace-boot | \
+		grep \
+			--max-count=1 \
+			--silent \
+			'Status: install ok installed'
+} || N_INSTALLED=$?
+if [ "$N_INSTALLED" -eq 0 ]
+then
+	echo "Generating perfetto deep-link"
+	{
+		echo '<h2>Boot Trace</h2>'
+		if [ ! -f /run/rpi-trace-boot.service/trace ]; then
+			echo "No boot trace found."
+		else
+			printf '
+<script type="text/javascript">
+const ORIGIN = "https://ui.perfetto.dev";
+
+function deep_link_perfetto() {
+	const b64_data = "'
+			base64 --wrap=0 /run/rpi-trace-boot.service/trace
+			echo '";
+	var bin_str = atob(b64_data);
+	var bytes = new Uint8Array(bin_str.length);
+	for (var i=0; i < bin_str.length; i++) {
+		bytes[i] = bin_str.charCodeAt(i);
+	}
+
+	const win = window.open(ORIGIN);
+
+	const onMessageHandler = (evt) => {
+		if (evt.data !== "PONG") return;
+
+		window.clearInterval(timer);
+		window.removeEventListener("message", onMessageHandler);
+
+		win.postMessage({
+			perfetto: {
+				buffer: bytes.buffer,
+				title: "RPI Trace Boot",
+			}}, ORIGIN);
+	};
+
+	window.addEventListener("message", onMessageHandler);
+
+	const timer = setInterval(() => win.postMessage("PING", ORIGIN), 50);
+}
+</script>
+<button type="button" onclick='"'"'deep_link_perfetto()'"'"'>View Boot Trace</button>'
+		fi
+	} >> "${HTML_FILE}"
+fi
+
+# Footer
+echo "Generating HTML footer"
+echo '</body>
+</html>' >> "${HTML_FILE}"
+
+echo "DONE"

@@ -1,0 +1,14 @@
+[Unit]
+Description=Perform boot analysis
+DefaultDependencies=no
+Requires=boot-complete.target
+After=local-fs.target boot-complete.target
+
+[Service]
+Type=simple
+Restart=no
+ExecStart=/usr/sbin/rpi-analyse-boot
+StandardError=tty
+
+[Install]
+WantedBy=default.target
