@@ -3,8 +3,9 @@
 override_dh_installsystemd:
 	dh_installsystemd --no-start --no-stop-on-upgrade
 
-%:
-	mkdir -p debian/tmp
+execute_before_dh_install:
 	pandoc rpi-analyse-boot.md --standalone --to=man --shift-heading-level-by=-1 \
 		--output=debian/rpi-analyse-boot.service.8
+
+%:
 	dh $@ --with-systemd
