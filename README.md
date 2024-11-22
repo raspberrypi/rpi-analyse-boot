@@ -29,6 +29,6 @@ embedded [Perfetto](https://perfetto.dev) boot trace.
 
 On Raspberry Pi OS:
 ```
-dpkg-buildpackage -uc -us
+gbp buildpackage --git-debian-branch=main -uc -us
 sudo dpkg -i ../rpi-analyse-boot_<version>_all.deb
 ```
