@@ -1,0 +1,8 @@
+debhelper-build-stamp
+.debhelper
+*.debhelper.log
+*.postrm.debhelper
+*.substvars
+debian/files
+debian/rpi-analyse-boot
+debian/rpi-analyse-boot.service.8
