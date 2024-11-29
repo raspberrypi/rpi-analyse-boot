@@ -1,3 +1,13 @@
+rpi-analyse-boot (20241129) bookworm; urgency=medium
+
+  * debian: Improve rules to generate/clean man pages
+  * debian/copyright: Ensure machine-readable
+  * gitignore: Generated Debian packaging files
+  * README: git-buildpackage instructions
+  * raspi-utils-core is now 'Recommends', not 'Depends'
+
+ -- Richard Oliver <richard.oliver@raspberrypi.com>  Fri, 29 Nov 2024 11:34:10 +0000
+
 rpi-analyse-boot (20241121) bookworm; urgency=medium
 
   * Add rpi-analyse-boot.service(8) man page
