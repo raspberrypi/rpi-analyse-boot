@@ -12,6 +12,9 @@ RUNTIME_DIRECTORY="${RUNTIME_DIRECTORY:=/run/${SERVICE_NAME}.service}"
 mkdir -p "${RUNTIME_DIRECTORY}"
 HTML_FILE="${RUNTIME_DIRECTORY}/index.html"
 
+N_VCGENCMD_AVAILABLE=0
+command -v vcgencmd >/dev/null 2>/dev/null || N_VCGENCMD_AVAILABLE=$?
+
 # Header
 echo "Generating HTML header"
 echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -30,13 +33,13 @@ echo "Generating system/videocore information"
 	echo '<h3>General</h3>'
 	echo '<pre>'
 
-	sed 's/\x0//g' /sys/firmware/devicetree/base/model
+	sed 's/\x0//g' /sys/firmware/devicetree/base/model || echo 'MODEL NOT AVAILABLE'
 	echo
 
 	head -4 /etc/os-release
 	echo
 
-	cat /etc/rpi-issue
+	cat /etc/rpi-issue || echo '/etc/rpi-issue not found'
 	echo
 
 	uname -a
@@ -44,16 +47,19 @@ echo "Generating system/videocore information"
 
 	tail -3 /proc/cpuinfo
 
-	echo "Throttled flag  : $(vcgencmd get_throttled)"
-	echo "Camera          : $(vcgencmd get_camera)"
-	echo '</pre>'
+	if [ 0 -eq $N_VCGENCMD_AVAILABLE ]
+	then
+		echo "Throttled flag  : $(vcgencmd get_throttled)"
+		echo "Camera          : $(vcgencmd get_camera)"
+		echo '</pre>'
 
-	echo '<h3>Videocore</h3>'
-	echo '<pre>'
+		echo '<h3>Videocore</h3>'
+		echo '<pre>'
 
-	vcgencmd version
-	echo
-	vcgencmd mem_reloc_stats || true
+		vcgencmd version
+		echo
+		vcgencmd mem_reloc_stats || true
+	fi
 	echo '</pre>'
 } >> "${HTML_FILE}"
 
