@@ -2,7 +2,7 @@ Source: rpi-analyse-boot
 Section: utils
 Priority: optional
 Maintainer: Richard Oliver <richard.oliver@raspberrypi.com>
-Build-Depends: pandoc
+Build-Depends: debhelper, pandoc
 Standards-Version: 4.3.0
 Vcs-Git: git://git@github.com:raspberrypi/rpi-analyse-boot.git
 Vcs-Browser: https://github.com/raspberrypi/rpi-analyse-boot
