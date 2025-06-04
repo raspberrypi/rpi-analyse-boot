@@ -63,6 +63,18 @@ echo "Generating system/videocore information"
 	echo '</pre>'
 } >> "${HTML_FILE}"
 
+# PSI Information
+# cmdline: psi=1 if PSI_DEFAULT_DISABLED=y
+if [ -d "/proc/pressure" ]; then
+	echo "Generating PSI information"
+	{
+		echo '<h2>Pressure Stall Information (PSI)</h2>'
+		awk \
+			-f /usr/share/rpi-analyse-boot/psi_html.awk \
+			/proc/timer_list /proc/pressure/*
+	} >> "${HTML_FILE}"
+fi
+
 # Critical Path
 echo "Generating critical-chain analysis"
 {
