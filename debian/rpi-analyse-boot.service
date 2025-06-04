@@ -7,7 +7,7 @@ After=local-fs.target boot-complete.target
 [Service]
 Type=simple
 Restart=no
-ExecStart=/usr/sbin/rpi-analyse-boot
+ExecStart=/usr/share/rpi-analyse-boot/bin/rpi-analyse-boot
 StandardError=tty
 
 [Install]

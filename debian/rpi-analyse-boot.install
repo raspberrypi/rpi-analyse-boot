@@ -1,3 +1,3 @@
 usr/
-rpi-analyse-boot /usr/sbin
+rpi-analyse-boot /usr/share/rpi-analyse-boot/bin
 psi_html.awk /usr/share/rpi-analyse-boot
