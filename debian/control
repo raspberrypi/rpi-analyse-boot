@@ -9,7 +9,7 @@ Vcs-Browser: https://github.com/raspberrypi/rpi-analyse-boot
 
 Package: rpi-analyse-boot
 Architecture: all
-Depends: ${misc:Depends}, aha, bsdutils, coreutils, dpkg, grep, sed, systemd
+Depends: ${misc:Depends}, aha, systemd
 Recommends: raspi-utils-core
 Suggests: rpi-trace-boot
 Description: A tool to gather boot-time performance information
