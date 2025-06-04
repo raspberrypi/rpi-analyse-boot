@@ -1,3 +1,15 @@
+rpi-analyse-boot (20250604) bookworm; urgency=medium
+
+  * Add PSI (Pressure Stall Information)
+  * Add salsa-ci.yml
+  * Move internal-use script to /usr/share
+  * debian/control: Don't depend on essential pkgs
+  * debian/control: Improve description
+  * Lintian override for launcher
+  * debian/control: Build depends debhelper
+
+ -- Richard Oliver <richard.oliver@raspberrypi.com>  Wed, 04 Jun 2025 15:59:12 +0100
+
 rpi-analyse-boot (20241129) bookworm; urgency=medium
 
   * debian: Improve rules to generate/clean man pages
