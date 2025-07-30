@@ -1,3 +1,10 @@
+rpi-analyse-boot (20250730) trixie; urgency=medium
+
+  * debian: Update copyright wording/date
+  * debian: Update for Trixie
+
+ -- Richard Oliver <richard.oliver@raspberrypi.com>  Wed, 30 Jul 2025 12:55:01 +0100
+
 rpi-analyse-boot (20250604) bookworm; urgency=medium
 
   * Add PSI (Pressure Stall Information)
